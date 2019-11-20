@@ -1,0 +1,30 @@
+name: Node CI
+
+on: [push]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v1
+    - name: Use Node.js 10.x
+      uses: actions/setup-node@v1
+      with:
+        node-version: 10.x
+    - name: Cache
+      id: cache-node_modules
+      uses: actions/cache@v1.0.2
+      with:
+          # A directory to store and save the cache
+          path: 'node.js-with-npm/node_modules'
+          # An explicit key for restoring and saving the cache
+          key: ${{ runner.os }}-node-${{ hashFiles('node.js-with-npm/**/package-lock.json') }}
+    - name: npm install, build, and test
+      if: steps.cache-primes.outputs.cache-hit != 'true'
+      run: |
+        cd node.js-with-npm
+        npm install
+      env:
+        CI: true
